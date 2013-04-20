@@ -144,6 +144,17 @@ function choosemap() {
 	var el = document.getElementById("bigmap");
 	el.style.display = 'block';
 	displayMap(levelname, el.firstChild);
+
+	if (window.onlyCharInfo) {
+		let mypos = document.createElement('div');
+		mypos.style.backgroundColor = 'blue';
+		mypos.style.borderRadius = '7px';
+		mypos.className = 'tile';
+		var x = window.onlyCharInfo.x;
+		var y = window.onlyCharInfo.y;
+		setXY(mypos, x, y);
+		el.firstChild.appendChild(mypos);
+	}
 }
 
 var mapCache = {};
@@ -375,6 +386,7 @@ function draw() {
 
 				window.onlyChar = ch;
 				getChar(function(chinfo) {
+					window.onlyCharInfo = chinfo;
 					e3.firstChild.data = chinfo.name;
 					let html = "";
 					for (let a of attr) {
