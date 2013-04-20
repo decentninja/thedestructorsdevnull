@@ -3,7 +3,7 @@
 <style>
 #closebutton {
 	position: absolute;
-	bottom: 5px;
+	top: 5px;
 	right: 5px;
 }
 #bigmap {
@@ -80,6 +80,11 @@ function setXY(e, x, y) {
 	e.style.top = (y * 20 + 80) + 'px';
 	e.style.left = (x * 20) + 'px';
 }
+
+document.onkeydown = function(ev) {
+	if (ev.keyCode === 27)
+		document.getElementById("bigmap").style.display = 'none';
+};
 
 var xCache = {};
 function cachedX(e, obj, text, callback) {
