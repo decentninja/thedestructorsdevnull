@@ -145,6 +145,12 @@ function draw() {
 				let roomid = 0;
 				e3.textContent = ch + ", " + obj.map;
 				e3.appendChild(bottom);
+				getChar(function(job) {
+					e3.firstChild.data = job.name;
+					for(let item of job.inventory) {
+						
+					}
+				}, ch);
 				e3.className = 'board';
 				let width = area[0].length, height = area.length;
 				e3.style.width = (width * 20) + "px";
