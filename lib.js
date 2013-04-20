@@ -58,11 +58,11 @@ function doMoveStairs(success, id, type) {
 
 function doUse(success, id, itemId, itemInfo) {
 	var type;
-	if (itemInfo == "potion")
+	if (itemInfo.type == "potion")
 		type = "quaff";
-	else if (itemInfo == "weapon")
+	else if (itemInfo.type == "weapon")
 		type = "wield";
-	else if (itemInfo == "armor")
+	else if (itemInfo.type == "armor")
 		type = "equip";
 	else
 		type = prompt("lolwat?");
