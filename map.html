@@ -145,12 +145,6 @@ function draw() {
 				let roomid = 0;
 				e3.textContent = ch + ", " + obj.map;
 				e3.appendChild(bottom);
-				getChar(function(job) {
-					e3.firstChild.data = job.name;
-					for(let item of job.inventory) {
-						
-					}
-				}, ch);
 				e3.className = 'board';
 				let width = area[0].length, height = area.length;
 				e3.style.width = (width * 20) + "px";
@@ -230,6 +224,7 @@ function draw() {
 				}
 
 				getChar(function(chinfo) {
+					e3.firstChild.data = chinfo.name;
 					var text = "";
 					for (let a of attr) {
 						text += a + ": " + chinfo[a] + ", ";
@@ -242,10 +237,10 @@ function draw() {
 						inventorye.appendChild(e2);
 						cachedX(e2, {_id: item}, "");
 					}
-				}, ch);
 
-				--waitLeft;
-				if (waitLeft === 0) loadDone();
+					--waitLeft;
+					if (waitLeft === 0) loadDone();
+				}, ch);
 			}, ch);
 			})();
 		}
@@ -253,6 +248,6 @@ function draw() {
 }
 draw();
 setInterval(function() {
-	// draw();
+	draw();
 }, 2000);
 </script>
