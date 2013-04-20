@@ -1,0 +1,87 @@
+
+
+Logged in as:   Gurthang   team:  The Destructors [C04]
+      
+569A05081617C05B0511511101413A022C043124787256564722798260517282574151903034D01C07834898010B02C01B08C03A07A03D03C02B04B01D02A014680A01C08GOOGA08C06D05B07B06D04B03A06A0435
+
+Highscores
+
+    1C04
+    300
+    2D01
+    200
+    3C07
+    200
+    4A02
+    200
+    5B02
+    100
+    6C01
+    100
+    7B08
+    100
+    8C03
+    100
+    9A07
+    100
+    10A03
+    100
+
+You have a new challenge!
+
+    MAP_LIST : [object Object]
+    Reachable nodes: None 
+    Got list of teams 
+    Challenge: Peekaboo
+    User logged in: Gurthang
+    NEUROPER: You are connected to /dev/null
+
+Created by:
+Powered by:
+Challenge:
+
+The character(s) that have been created have actually appeared in the dungeon already, you just haven’t been able to see it. Let’s do something about that. Use the following API call to scan the surroundings of a given character;
+
+/api3/?session=<sessionkey>&command=scan&arg=ri4llrZXK
+
+The data returned will and can contain lots of things, but at the moment we focus only on the surroundings.
+
+The ‘area’ property in the returned data contains an array of arrays which is a simple representation of the surrounding dungeon area that the characters sees. Each cell is a floor tile. The following table explains what kind of information is encoded in the tile;
+
+NOTHING     = 0x00000000;
+
+BLOCKED     = 0x00000001;
+
+ROOM        = 0x00000002;
+
+CORRIDOR    = 0x00000004;
+
+PERIMETER   = 0x00000010;
+
+ENTRANCE    = 0x00000020;
+
+ROOM_ID     = 0x0000FFC0;
+
+ARCH        = 0x00010000;
+
+DOOR        = 0x00020000;
+
+DOOR      = 0x00040000;
+
+DOOR     = 0x00080000;
+
+DOOR      = 0x00100000;
+
+PORTCULLIS   = 0x00200000;
+
+STAIR_DOWN  = 0x00400000;
+
+STAIR_UP    = 0x00800000;
+
+LABEL       = 0xFF000000;
+
+The only thing important is to mark blocked areas, which can’t be walked on (like walls), which will be either ‘0’ or have bit 1 set, to mark room number and where the stairs are.
+
+Display the map (in some kind of 2D representation) that each character currently see near the short format display for that character.  The ‘x’ and ‘y’ properties in the returned data marks the absolute map coordinates where the character is positioned and the ‘bx’ and ‘by’ properties denoted the offset in absolute map coordinates for position 0,0 in the ‘area’ data.
+
+Your Response (Paste code, answers or other information that shows that you have solved the challenge):

@@ -1,0 +1,18 @@
+
+Things are nice. Let’s find some and grab them, they might come in handy, who knows?
+
+Use the following API call to get the item at the coordinates your character is standing on (the argument is the id of your character);
+
+/api3/?session=<sessionkey>&command=get&arg=ri4llrZXK
+
+You will soon get an ‘inventory’ update in your scan calls, which lists the current content of your inventory. This information can also be retrieved using the getcharacter APi call.
+
+Add an inventory list next to the character map which lists the names of the items in the current directory.
+
+To drop something from your inventory, use the following call (the fist argument is the id of the item, the second the id of your character);
+
+/api3/?session=<sessionkey>&command=drop&arg=ra0mhhzJi&arg2=ri4llrZXK
+
+Make sure that the inventory lets you select an item and shows an updated view where the dropped item is gone after it is dropped.
+
+Demonstrate how to make two characters exchange an item.

@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
+.stats span {
+	color: purple;
+}
 .stats {
 	position: absolute;
 	left: 70px;
@@ -88,9 +91,12 @@ function draw() {
 		el.textContent = '';
 		var list = obj.characters;
 		var waitLeft = list.length;
+		if (!waitLeft)
+			area.textContent = 'All are dead...';
+
 		for (var ch2 of list) {
-			let ch = ch2;
 			(function() {
+			let ch = ch2;
 			var e3 = document.createElement("div");
 			var side = document.createElement("div");
 			var bottom = document.createElement("div");
@@ -145,7 +151,6 @@ function draw() {
 			scan(function(obj) {
 				console.log("scan", obj);
 				var area = obj.area;
-				let roomid = 0;
 				e3.textContent = ch + ", " + obj.map;
 				e3.appendChild(bottom);
 				e3.className = 'board';
@@ -157,8 +162,9 @@ function draw() {
 					var e2 = document.createElement("div");
 					for (var x = 0; x < a.length; ++x) {
 						var e = document.createElement("div");
-						var tile = a[x];
-						roomid |= (tile & 0x0000FFC0);
+						var tile = +a[x];
+						let roomid = (tile & 0x0000FFC0) >> 6;
+						e.style.backgroundColor = 'rgb(0,' + ((roomid * 1341) % 256) + ',0)';
 						var str = '';
 						if (tile & 1)
 							e.style.backgroundColor = 'darkgrey';
@@ -177,8 +183,6 @@ function draw() {
 					}
 					e3.appendChild(e2);
 				}
-				roomid >>= 6; // ? unspecified
-				e3.appendChild(document.createTextNode(roomid));
 
 				let addEntity = function(thing, color) {
 					let mypos = document.createElement('div');
@@ -228,17 +232,30 @@ function draw() {
 
 				getChar(function(chinfo) {
 					e3.firstChild.data = chinfo.name;
-					var text = "";
+					let html = "";
 					for (let a of attr) {
-						text += a + ": " + chinfo[a] + ", ";
+						html += "<span>" + a + ": " + chinfo[a] + "</span>, ";
 					}
-					text += "hp: " + chinfo.hp;
-					text += ", speed: " + chinfo.speed;
-					text += ", level: " + chinfo.level + " (xp: " + chinfo.exp + ")";
-					// text += ", alloc: " + chinfo.alloc;
-					// text = text.slice(0, -2);
-					statse.textContent = text;
-					var inv = chinfo.inventory;
+					html += "hp: " + chinfo.hp;
+					html += ", speed: " + chinfo.speed;
+					html += ", level: " + chinfo.level + " (xp: " + chinfo.exp + ")";
+					if (chinfo.alloc)
+						html += ", alloc: " + chinfo.alloc;
+					statse.innerHTML = html;
+					if (chinfo.alloc > 0) {
+						let ind = 0;
+						for (let a2 of attr) {
+							let a = a2;
+							let el = statse.children[ind++];
+							el.onmousedown = function() {
+								allocPoints(function(ret) {
+									console.log("alloc", ret);
+									draw();
+								}, ch, a);
+							};
+						}
+					}
+					let inv = chinfo.inventory;
 					if (inv) {
 						for (let item of inv) {
 							let e3 = document.createElement('span');
@@ -254,7 +271,7 @@ function draw() {
 								return false;
 							};
 							link.style.color = 'lightblue';
-							link.textContent = '(drop)';
+							link.textContent = ' (drop)';
 							e2.appendChild(link);
 							inventorye.appendChild(e2);
 							cachedX(e3, {_id: item}, "");

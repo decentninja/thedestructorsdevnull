@@ -48,6 +48,10 @@ function doDrop(success, id, itemId) {
 	makeReq("drop&arg=" + encodeURIComponent(itemId) + "&arg2=" + encodeURIComponent(id), success);
 }
 
+function doAllocPoints(success, id, attr) {
+	makeReq("allocatepoints&arg=" + attr + "&arg2=" + encodeURIComponent(id), success);
+}
+
 var last10Req = [];
 function ratelimit(fun) {
 	return function f() {
@@ -76,6 +80,7 @@ var sendMove = ratelimit(doSendMove);
 var examine = ratelimit(doExamine);
 var pick = ratelimit(doPick);
 var drop = ratelimit(doDrop);
+var allocPoints = ratelimit(doAllocPoints);
 
 /*
 createChar(function(ret) {
