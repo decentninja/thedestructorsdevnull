@@ -85,7 +85,7 @@ var xCache = {};
 function cachedX(e, obj, text, callback) {
 	function done(ret) {
 		if (ret.name === undefined || ret.name == "undefined")
-			console.warn("!!!!!" + ret);
+			console.warn("!!!!!", ret);
 		var out = text + ret.name;
 		if (ret.description)
 			out += " (" + ret.description + ")";
