@@ -22,14 +22,17 @@ button {
 	bottom: 0;
 	right: 0;
 }
-.stats span {
+.stats .attr {
+	color: purple;
+}
+.dropweapon, .droparmor {
 	color: purple;
 }
 .stats {
 	position: absolute;
 	left: 70px;
-	width: 350px;
-	margin-top: -55px;
+	width: 360px;
+	margin-top: -58px;
 	/*white-space: pre-line;*/
 }
 .inventory {
@@ -74,6 +77,7 @@ button {
 </div>
 <button onclick="choosemap();">Show maps</button>
 <script type="text/javascript;version=1.8">
+// wieldedweapon, wieldedweaponname
 var attr = ["str", "dex", "con", "int", "wis"];
 var area = document.getElementById('area');
 function setXY(e, x, y) {
@@ -364,13 +368,24 @@ function draw() {
 					e3.firstChild.data = chinfo.name;
 					let html = "";
 					for (let a of attr) {
-						html += "<span>" + a + ": " + chinfo[a] + "</span>, ";
+						html += "<span class='attr'>" + a + ": " + chinfo[a] + "</span>, ";
 					}
 					html += "hp: " + chinfo.hp;
 					html += ", speed: " + chinfo.speed;
+					html += ", ac: " + chinfo.ac;
 					html += ", level: " + chinfo.level + " (xp: " + chinfo.exp + ")";
 					if (chinfo.alloc)
 						html += ", alloc: " + chinfo.alloc;
+					if (chinfo.wieldedweapon || chinfo.equippedarmor) {
+						html += "<br><nobr>";
+						if (chinfo.wieldedweapon)
+							html += "<span class='dropweapon'>Weapon: " + chinfo.wieldedweaponname + "</span>";
+						if (chinfo.wieldedweapon && chinfo.equippedarmor)
+							html += ",";
+						if (chinfo.equippedarmor)
+							html += " <span class='droparmor'>Armor: " + chinfo.equippedarmorname + "</span>";
+						html += "</nobr>";
+					}
 					statse.innerHTML = html;
 					if (chinfo.alloc > 0) {
 						let ind = 0;
@@ -387,7 +402,8 @@ function draw() {
 					}
 					let inv = chinfo.inventory;
 					if (inv) {
-						for (let item of inv) {
+						for (let item2 of inv) {
+							let item = item2;
 							let e3 = document.createElement('span');
 							let e2 = document.createElement('div');
 							e2.appendChild(e3);
@@ -407,6 +423,11 @@ function draw() {
 
 							inventorye.appendChild(e2);
 							cachedX(e3, {_id: item}, "", function(iteminfo) {
+								let type = iteminfo.subtype;
+								if (["potion", "armor", "weapon"].indexOf(type) === -1) {
+									console.log("ignoring " + type);
+									return;
+								}
 								let link = document.createElement('a');
 								link.onmousedown = function() {
 									use(function(ret) {

@@ -64,9 +64,6 @@ function doUse(success, id, itemId, itemInfo) {
 		type = "wield";
 	else if (itemInfo.subtype == "armor")
 		type = "equip";
-	else
-		type = prompt("lolwat \"" + itemInfo.subtype + "\"?");
-	console.warn(itemInfo);
 	makeReq(type + "&arg=" + itemId + "&arg2=" + id, success);
 }
 
