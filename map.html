@@ -124,9 +124,21 @@ function choosemap() {
 var mapCache = {};
 var levels = {};
 function cacheTile(map, x, y, tile) {
+	var save;
 	var key = JSON.stringify({"m": map, "x": x, "y": y});
+	if (!(key in mapCache))
+		save = true;
 	mapCache[key] = tile;
 	levels[map] = 1;
+	if (save) {
+		localStorage.save = JSON.stringify(mapCache);
+		localStorage.levels = JSON.stringify(levels);
+	}
+}
+
+if (localStorage.save) {
+	mapCache = JSON.parse(localStorage.save);
+	levels = JSON.parse(localStorage.levels);
 }
 
 function displayMap(map, where) {
