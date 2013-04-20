@@ -1,6 +1,27 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
+#closebutton {
+	position: absolute;
+	bottom: 5px;
+	right: 5px;
+}
+#bigmap {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	padding: 15px;
+	z-index: 200;
+	display: none;
+	background-color: white;
+ }
+button {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+}
 .stats span {
 	color: purple;
 }
@@ -48,6 +69,10 @@
 </style>
 <script src="lib.js"></script>
 <div id="area"></div>
+<div id="bigmap"><div id="bigmapcont"></div>
+	<input type="button" value="Close" id="closebutton" onclick="this.parentNode.style.display = 'none'">
+</div>
+<button onclick="choosemap();">Show maps</button>
 <script type="text/javascript;version=1.8">
 var attr = ["str", "dex", "con", "int", "wis"];
 var area = document.getElementById('area');
@@ -79,6 +104,79 @@ function cachedX(e, obj, text) {
 	}
 }
 
+function choosemap() {
+	var text = "Which one of:\n";
+	var m2 = [];
+	var ind = 0;
+	for (var l in levels) {
+		text += " [" + (++ind) + "] " + l + "\n";
+		m2.push(l);
+	}
+	text += "?";
+	var m = prompt(text)-1;
+	var levelname = m2[m];
+
+	var el = document.getElementById("bigmap");
+	el.style.display = 'block';
+	displayMap(levelname, el.firstChild);
+}
+
+var mapCache = {};
+var levels = {};
+function cacheTile(map, x, y, tile) {
+	var key = JSON.stringify({"m": map, "x": x, "y": y});
+	mapCache[key] = tile;
+	levels[map] = 1;
+}
+
+function displayMap(map, where) {
+	var board = [];
+	for (var key in mapCache) {
+		let ukey = JSON.parse(key);
+		if (ukey.m !== map)
+			continue;
+		while (!board[ukey.y])
+			board.push([]);
+		while (board[ukey.y].length <= ukey.x)
+			board[ukey.y].push(undefined);
+		board[ukey.y][ukey.x] = mapCache[key];
+	}
+
+	where.textContent = '';
+	addMap(where, board);
+}
+
+function addMap(e3, area) {
+	for (var y = 0; y < area.length; ++y) {
+		var a = area[y];
+		var e2 = document.createElement("div");
+		for (var x = 0; x < a.length; ++x) {
+			var e = document.createElement("div");
+			if (a[x] === undefined)
+				continue;
+			var tile = +a[x];
+			let roomid = (tile & 0x0000FFC0) >> 6;
+			e.style.backgroundColor = 'rgb(0,' + (((roomid * 1341) % 150) + 100) + ',0)';
+			var str = '';
+			if (tile & 1)
+				e.style.backgroundColor = 'darkgrey';
+			if (tile == 0)
+				e.style.backgroundColor = 'black';
+			if (tile & 0x00400000)
+				str = '梱';
+			if (tile & 0x00800000)
+				str = '當';
+			if (tile & 0xd0000)
+				str = 'D';
+			e.textContent = str;
+			e.className = 'tile';
+			setXY(e, x, y);
+			e2.appendChild(e);
+		}
+		e3.appendChild(e2);
+	}
+}
+
 function draw() {
 	var el = document.createElement("div");
 	function loadDone() {
@@ -87,7 +185,7 @@ function draw() {
 	}
 	el.textContent = 'Loading...';
 	getParty(function(obj) {
-		console.log("getparty", obj);
+		// console.log("getparty", obj);
 		el.textContent = '';
 		var list = obj.characters;
 		var waitLeft = list.length;
@@ -113,16 +211,16 @@ function draw() {
 			el.appendChild(e3);
 			el.appendChild(side);
 			var arrows = [
-				["↖", "↑", "↗"],
+				["↖", "↑", "↗", "↑"],
 				["←", " ", "→"],
-				["↙", "↓", "↘"]
+				["↙", "↓", "↘", "↓"]
 			], signals = [
 				["upleft", "up", "upright"],
 				["left", "", "right"],
 				["downleft", "down", "downright"]
 			];
 			for (var i = 0; i < 3; ++i) {
-				for (var j = 0; j < 3; ++j) {
+				for (var j = 0; j < arrows[i].length; ++j) {
 					let e = document.createElement('span');
 					e.className = 'arrow';
 					let sig = signals[i][j];
@@ -135,7 +233,7 @@ function draw() {
 							}, ch, sig);
 						};
 					}
-					else {
+					else if (i == 1) {
 						e.textContent = '#';
 						e.onmousedown = function() {
 							pick(function(ret) {
@@ -144,12 +242,20 @@ function draw() {
 							}, ch);
 						};
 					}
+					else {
+						e.onmousedown = function() {
+							moveStairs(function(ret) {
+								console.log("stairs", ret);
+								draw();
+							}, ch, (i === 0 ? "levelup" : "leveldown"));
+						};
+					}
 					arrowe.appendChild(e);
 				}
 				arrowe.appendChild(document.createElement('br'));
 			}
 			scan(function(obj) {
-				console.log("scan", obj);
+				// console.log("scan", obj);
 				var area = obj.area;
 				e3.textContent = ch + ", " + obj.map;
 				e3.appendChild(bottom);
@@ -157,32 +263,16 @@ function draw() {
 				let width = area[0].length, height = area.length;
 				e3.style.width = (width * 20) + "px";
 				e3.style.width = bottom.style.top = (height * 20) + "px";
+
 				for (var y = 0; y < area.length; ++y) {
 					var a = area[y];
-					var e2 = document.createElement("div");
 					for (var x = 0; x < a.length; ++x) {
-						var e = document.createElement("div");
 						var tile = +a[x];
-						let roomid = (tile & 0x0000FFC0) >> 6;
-						e.style.backgroundColor = 'rgb(0,' + ((roomid * 1341) % 256) + ',0)';
-						var str = '';
-						if (tile & 1)
-							e.style.backgroundColor = 'darkgrey';
-						if (tile == 0)
-							e.style.backgroundColor = 'black';
-						if (tile & 0x00400000)
-							str = '梱';
-						if (tile & 0x00800000)
-							str = '當';
-						if (tile & 0xd0000)
-							str = 'D';
-						e.textContent = str;
-						e.className = 'tile';
-						setXY(e, x, y);
-						e2.appendChild(e);
+						cacheTile(obj.map, obj.bx + x, obj.by + y, tile);
 					}
-					e3.appendChild(e2);
 				}
+
+				addMap(e3, area);
 
 				let addEntity = function(thing, color) {
 					let mypos = document.createElement('div');
