@@ -113,6 +113,12 @@ function draw() {
 				let roomid = 0;
 				e3.textContent = ch + ", " + obj.map;
 				e3.appendChild(bottom);
+				getChar(function(job) {
+					e3.firstChild.data = job.name;
+					for(let item of job.inventory) {
+						
+					}
+				}, ch);
 				e3.className = 'board';
 				e3.style.width = (area[0].length * 20) + "px";
 				e3.style.width = bottom.style.top = (area.length * 20) + "px";
