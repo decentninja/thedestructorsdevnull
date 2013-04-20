@@ -163,11 +163,21 @@ function addMap(e3, area) {
 			if (tile == 0)
 				e.style.backgroundColor = 'black';
 			if (tile & 0x00400000)
-				str = '梱';
+				str += '梱';
 			if (tile & 0x00800000)
-				str = '當';
-			if (tile & 0xd0000)
-				str = 'D';
+				str += '當';
+			if (tile & 0x1d0000)
+				str += 'D';
+			if (tile & 0x20)
+				str += '|';
+			if (tile & 0xFF000000)
+				str += 'L';
+			if (tile & 0x00200000)
+				str += 'P';
+			if (tile & 0x00010000)
+				str += 'A';
+			if (tile & 0x00000020)
+				str += 'O';
 			e.textContent = str;
 			e.className = 'tile';
 			setXY(e, x, y);
@@ -243,11 +253,12 @@ function draw() {
 						};
 					}
 					else {
+						let ai = i;
 						e.onmousedown = function() {
 							moveStairs(function(ret) {
 								console.log("stairs", ret);
 								draw();
-							}, ch, (i === 0 ? "levelup" : "leveldown"));
+							}, ch, (ai === 0 ? "levelup" : "leveldown"));
 						};
 					}
 					arrowe.appendChild(e);
@@ -305,7 +316,7 @@ function draw() {
 				for (let item of obj.items) {
 					let e = addEntity(item, 'yellow');
 					++ind;
-					let ch = String.fromCharCode(0x3b0 + ind); // 96
+					let ch = String.fromCharCode(0x3b0 + ind);
 					e.textContent = ch;
 
 					e2 = document.createElement('div');
