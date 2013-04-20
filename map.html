@@ -88,6 +88,15 @@ function setXY(e, x, y) {
 document.onkeydown = function(ev) {
 	if (ev.keyCode === 27)
 		document.getElementById("bigmap").style.display = 'none';
+	var dirs = [[37, "left"], [38, "up"], [39, "right"], [40, "down"]];
+	for (let d of dirs) {
+		if (ev.keyCode === d[0]) {
+			sendMove(function(ret) {
+				console.log("move", ret);
+				draw();
+			}, window.onlyChar, d[1]);
+		}
+	}
 };
 
 var xCache = {};
@@ -364,6 +373,7 @@ function draw() {
 					}
 				}
 
+				window.onlyChar = ch;
 				getChar(function(chinfo) {
 					e3.firstChild.data = chinfo.name;
 					let html = "";
@@ -387,6 +397,27 @@ function draw() {
 						html += "</nobr>";
 					}
 					statse.innerHTML = html;
+					let a;
+					if (a = statse.getElementsByClassName('droparmor')[0]) {
+						a.onmousedown = function() {
+							console.log("unequip1");
+							unequip(function(ret) {
+								console.log("unequip", ret);
+								draw();
+							}, ch, chinfo.equippedarmor, "unequip");
+							return false;
+						};
+					}
+					if (a = statse.getElementsByClassName('dropweapon')[0]) {
+						a.onmousedown = function() {
+							console.log("unwield1");
+							unequip(function(ret) {
+								console.log("unequip", ret);
+								draw();
+							}, ch, chinfo.wieldedweapon, "unwield");
+							return false;
+						};
+					}
 					if (chinfo.alloc > 0) {
 						let ind = 0;
 						for (let a2 of attr) {
@@ -425,7 +456,7 @@ function draw() {
 							cachedX(e3, {_id: item}, "", function(iteminfo) {
 								let type = iteminfo.subtype;
 								if (["potion", "armor", "weapon"].indexOf(type) === -1) {
-									console.log("ignoring " + type);
+									// console.log("ignoring " + type);
 									return;
 								}
 								let link = document.createElement('a');

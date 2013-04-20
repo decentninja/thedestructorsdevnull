@@ -56,6 +56,10 @@ function doMoveStairs(success, id, type) {
 	makeReq(type + "&arg=" + id, success);
 }
 
+function doUnequip(success, id, itemId, type) {
+	makeReq(type + "&arg=" + itemId + "&arg2=" + id, success);
+}
+
 function doUse(success, id, itemId, itemInfo) {
 	var type;
 	if (itemInfo.subtype == "potion")
@@ -98,6 +102,7 @@ var drop = ratelimit(doDrop);
 var allocPoints = ratelimit(doAllocPoints);
 var moveStairs = ratelimit(doMoveStairs);
 var use = ratelimit(doUse);
+var unequip = ratelimit(doUnequip);
 
 /*
 createChar(function(ret) {
