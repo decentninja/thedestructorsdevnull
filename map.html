@@ -82,7 +82,7 @@ function setXY(e, x, y) {
 }
 
 var xCache = {};
-function cachedX(e, obj, text) {
+function cachedX(e, obj, text, callback) {
 	function done(ret) {
 		if (ret.name === undefined || ret.name == "undefined")
 			console.warn("!!!!!" + ret);
@@ -92,6 +92,8 @@ function cachedX(e, obj, text) {
 		else if (ret.subtype)
 			out += " (" + ret.subtype + ")";
 		e.textContent = out;
+		if (callback)
+			callback(ret);
 	}
 	var id = obj._id;
 	if (xCache[id]) {
