@@ -84,6 +84,8 @@ function setXY(e, x, y) {
 var xCache = {};
 function cachedX(e, obj, text) {
 	function done(ret) {
+		if (ret.name === undefined || ret.name == "undefined")
+			alert(ret);
 		var out = text + ret.name;
 		if (ret.description)
 			out += " (" + ret.description + ")";
@@ -92,7 +94,7 @@ function cachedX(e, obj, text) {
 		e.textContent = out;
 	}
 	var id = obj._id;
-	if (id in xCache) {
+	if (xCache[id]) {
 		done(xCache[id]);
 	}
 	else {
@@ -170,7 +172,7 @@ function addMap(e3, area) {
 			let roomid = (tile & 0x0000FFC0) >> 6;
 			e.style.backgroundColor = 'rgb(0,' + (((roomid * 1341) % 150) + 100) + ',0)';
 			var str = '';
-			if (tile & 11)
+			if (tile & 0x11)
 				e.style.backgroundColor = 'darkgrey';
 			if (tile == 0)
 				e.style.backgroundColor = 'black';
