@@ -1,6 +1,7 @@
 var key = '86848195-3da5-444b-b9ba-50bef67bf677';
 
 function makeReq(urlPart, success) {
+	console.log(urlPart);
 	var req = new XMLHttpRequest();
 	req.open("GET", "https://genericwitticism.com:8000/api3/?session=" + key + "&command=" + urlPart);
 	req.onreadystatechange = function() {
@@ -27,14 +28,27 @@ function doDeleteChar(success, id) {
 	makeReq("deletecharacter&arg=" + encodeURIComponent(id), success);
 }
 
+function doScan(success, id) {
+	makeReq("scan&arg=" + encodeURIComponent(id), success);
+}
+
+function doSendMove(success, id, dir) {
+	makeReq("move&arg=" + encodeURIComponent(id) + "&arg2=" + dir, success);
+}
+
+function doExamine(success, id) {
+	makeReq("getinfofor&arg=" + encodeURIComponent(id), success);
+}
+
 var last10Req = [];
 function ratelimit(fun) {
 	return function f() {
+		var args = arguments;
 		var now = Date.now();
 		if (last10Req.length === 10) {
 			if (last10Req[0] + 1000 > now) {
 				setTimeout(function() {
-					f.apply(this, arguments);
+					f.apply(this, args);
 				}, last10Req[0] + 1000 - now);
 				return;
 			}
@@ -49,6 +63,9 @@ var getParty = ratelimit(doGetParty);
 var createChar = ratelimit(doCreateChar);
 var getChar = ratelimit(doGetChar);
 var deleteChar = ratelimit(doDeleteChar);
+var scan = ratelimit(doScan);
+var sendMove = ratelimit(doSendMove);
+var examine = ratelimit(doExamine);
 
 /*
 createChar(function(ret) {

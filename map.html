@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+.arrow {
+	width: 15px;
+	display: inline-block;
+}
+.board {
+	display: inline-block;
+	margin-right: 100px;
+	position: relative;
+}
+.tile {
+	opacity: 0.8;
+	position: absolute;
+	height: 18px;
+	width: 18px;
+	border: 1px solid #555;
+	text-indent: 3px;
+}
+.side {
+	font-size: 80%;
+	display: inline-block;
+	vertical-align: top;
+	width: 210px;
+	white-space: nowrap;
+}
+.bottom {
+	position: absolute;
+	margin-top: 100px;
+}
+</style>
+<script src="lib.js"></script>
+<div id="area"></div>
+<script type="text/javascript;version=1.8">
+var area = document.getElementById('area');
+function setXY(e, x, y) {
+	e.style.top = (y * 20 + 80) + 'px';
+	e.style.left = (x * 20) + 'px';
+}
+
+var xCache = {};
+function cachedX(e, obj, text) {
+	function done(ret) {
+		var out = text + ": " + ret.name;
+		if (ret.subtype)
+			out += " (" + ret.subtype + ")";
+		e.textContent = out;
+	}
+	var id = obj._id;
+	if (id in xCache) {
+		done(xCache[id]);
+	}
+	else {
+		examine(function(ret) {
+			xCache[id] = ret;
+			console.log(ret);
+			done(ret);
+		}, id);
+	}
+}
+
+function draw() {
+	var el = document.createElement("div");
+	function loadDone() {
+		area.textContent = '';
+		area.appendChild(el);
+	}
+	el.textContent = 'Loading...';
+	getParty(function(obj) {
+		el.textContent = '';
+		var list = obj.characters;
+		var waitLeft = list.length;
+		for (var ch2 of list) {
+			let ch = ch2;
+			(function() {
+			var e3 = document.createElement("div");
+			var side = document.createElement("div");
+			var bottom = document.createElement("div");
+			side.className = 'side';
+			bottom.className = 'bottom';
+			el.appendChild(e3);
+			el.appendChild(side);
+			var arrows = [
+				["↖", "↑", "↗"],
+				["←", " ", "→"],
+				["↙", "↓", "↘"]
+			], signals = [
+				["upleft", "up", "upright"],
+				["left", "", "right"],
+				["downleft", "down", "downright"]
+			];
+			for (var i = 0; i < 3; ++i) {
+				for (var j = 0; j < 3; ++j) {
+					let e = document.createElement('span');
+					e.className = 'arrow';
+					let sig = signals[i][j];
+					e.textContent = arrows[i][j];
+					if (sig) {
+						e.onmousedown = function() {
+							sendMove(function(ret) {
+								console.log(ret);
+								draw();
+							}, ch, sig);
+						};
+					}
+					bottom.appendChild(e);
+				}
+				bottom.appendChild(document.createElement('br'));
+			}
+			scan(function(obj) {
+				var area = obj.area;
+				let roomid = 0;
+				e3.textContent = ch + ", " + obj.map;
+				e3.appendChild(bottom);
+				e3.className = 'board';
+				e3.style.width = (area[0].length * 20) + "px";
+				e3.style.width = bottom.style.top = (area.length * 20) + "px";
+				for (var y = 0; y < area.length; ++y) {
+					var a = area[y];
+					var e2 = document.createElement("div");
+					for (var x = 0; x < a.length; ++x) {
+						var e = document.createElement("div");
+						var tile = a[x];
+						roomid |= (tile & 0x0000FFC0);
+						var str = '';
+						if (tile & 1)
+							e.style.backgroundColor = 'darkgrey';
+						if (tile == 0)
+							e.style.backgroundColor = 'black';
+						if (tile & 0x00400000)
+							str = '梱';
+						if (tile & 0x00800000)
+							str = '當';
+						if (tile & 0xd0000)
+							str = 'D';
+						e.textContent = str;
+						e.className = 'tile';
+						setXY(e, x, y);
+						e2.appendChild(e);
+					}
+					e3.appendChild(e2);
+				}
+				roomid >>= 6; // ? unspecified
+				e3.appendChild(document.createTextNode(roomid));
+
+				let addEntity = function(thing, color) {
+					let mypos = document.createElement('div');
+					mypos.style.backgroundColor = color;
+					mypos.style.borderRadius = '7px';
+					mypos.className = 'tile';
+					setXY(mypos, thing.x - obj.bx, thing.y - obj.by);
+					e3.appendChild(mypos);
+					return mypos;
+				};
+				addEntity(obj, 'blue');
+				let ind = 0;
+				for (let ent of obj.entities) {
+					let col = (ent.name.endsWith('[C04]') ? 'lightblue' : 'red');
+					let e = addEntity(ent, col);
+					e.textContent = ++ind;
+
+					e2 = document.createElement('div');
+					e2.textContent = ind + ": " + ent.name;
+					side.appendChild(e2);
+					cachedX(e2, ent, ind);
+				}
+
+				side.appendChild(document.createElement('hr'));
+
+				ind = 0;
+				for (let item of obj.items) {
+					let e = addEntity(item, 'yellow');
+					++ind;
+					let ch = String.fromCharCode(0x3b0 + ind); // 96
+					e.textContent = ch;
+
+					e2 = document.createElement('div');
+					e2.textContent = ch + ": " + item.name;
+					side.appendChild(e2);
+					cachedX(e2, item, ch);
+				}
+
+				--waitLeft;
+				if (waitLeft === 0) loadDone();
+			}, ch);
+			})();
+		}
+	});
+}
+draw();
+setInterval(function() {
+	draw();
+}, 2000);
+</script>
