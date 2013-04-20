@@ -40,16 +40,24 @@ function doExamine(success, id) {
 	makeReq("getinfofor&arg=" + encodeURIComponent(id), success);
 }
 
+function doPick(success, id) {
+	makeReq("get&arg=" + encodeURIComponent(id), success);
+}
+
+function doDrop(success, id, itemId) {
+	makeReq("get&arg=" + encodeURIComponent(itemId) + "&arg2=" + encodeURIComponent(id), success);
+}
+
 var last10Req = [];
 function ratelimit(fun) {
 	return function f() {
 		var args = arguments;
 		var now = Date.now();
 		if (last10Req.length === 10) {
-			if (last10Req[0] + 1000 > now) {
+			if (last10Req[0] + 1100 > now) {
 				setTimeout(function() {
 					f.apply(this, args);
-				}, last10Req[0] + 1000 - now);
+				}, last10Req[0] + 1100 - now);
 				return;
 			}
 			last10Req.shift();
@@ -66,6 +74,8 @@ var deleteChar = ratelimit(doDeleteChar);
 var scan = ratelimit(doScan);
 var sendMove = ratelimit(doSendMove);
 var examine = ratelimit(doExamine);
+var pick = ratelimit(doPick);
+var drop = ratelimit(doDrop);
 
 /*
 createChar(function(ret) {

@@ -1,13 +1,25 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
+.stats {
+	position: absolute;
+	left: 70px;
+	width: 350px;
+	margin-top: -55px;
+}
+.inventory {
+	position: absolute;
+	height: 170px;
+	width: 400px;
+	overflow: auto;
+}
 .arrow {
 	width: 15px;
 	display: inline-block;
 }
 .board {
 	display: inline-block;
-	margin-right: 100px;
+	margin-right: 70px;
 	position: relative;
 }
 .tile {
@@ -19,10 +31,10 @@
 	text-indent: 3px;
 }
 .side {
-	font-size: 80%;
+	font-size: 70%;
 	display: inline-block;
 	vertical-align: top;
-	width: 210px;
+	width: 240px;
 	white-space: nowrap;
 }
 .bottom {
@@ -33,6 +45,7 @@
 <script src="lib.js"></script>
 <div id="area"></div>
 <script type="text/javascript;version=1.8">
+var attr = ["str", "dex", "con", "int", "wis"];
 var area = document.getElementById('area');
 function setXY(e, x, y) {
 	e.style.top = (y * 20 + 80) + 'px';
@@ -42,8 +55,10 @@ function setXY(e, x, y) {
 var xCache = {};
 function cachedX(e, obj, text) {
 	function done(ret) {
-		var out = text + ": " + ret.name;
-		if (ret.subtype)
+		var out = text + ret.name;
+		if (ret.description)
+			out += " (" + ret.description + ")";
+		else if (ret.subtype)
 			out += " (" + ret.subtype + ")";
 		e.textContent = out;
 	}
@@ -54,7 +69,7 @@ function cachedX(e, obj, text) {
 	else {
 		examine(function(ret) {
 			xCache[id] = ret;
-			console.log(ret);
+			console.log("examine", ret);
 			done(ret);
 		}, id);
 	}
@@ -77,8 +92,16 @@ function draw() {
 			var e3 = document.createElement("div");
 			var side = document.createElement("div");
 			var bottom = document.createElement("div");
+			let arrowe = document.createElement("div");
+			let statse = document.createElement("div");
+			let inventorye = document.createElement("div");
+			bottom.appendChild(arrowe);
+			bottom.appendChild(statse);
+			bottom.appendChild(inventorye);
 			side.className = 'side';
 			bottom.className = 'bottom';
+			statse.className = 'stats';
+			inventorye.className = 'inventory';
 			el.appendChild(e3);
 			el.appendChild(side);
 			var arrows = [
@@ -99,14 +122,23 @@ function draw() {
 					if (sig) {
 						e.onmousedown = function() {
 							sendMove(function(ret) {
-								console.log(ret);
+								console.log("move",ret);
 								draw();
 							}, ch, sig);
 						};
 					}
-					bottom.appendChild(e);
+					else {
+						e.textContent = '#';
+						e.onmousedown = function() {
+							pick(function(ret) {
+								console.log("pick", ret);
+								draw();
+							}, ch);
+						};
+					}
+					arrowe.appendChild(e);
 				}
-				bottom.appendChild(document.createElement('br'));
+				arrowe.appendChild(document.createElement('br'));
 			}
 			scan(function(obj) {
 				var area = obj.area;
@@ -114,8 +146,9 @@ function draw() {
 				e3.textContent = ch + ", " + obj.map;
 				e3.appendChild(bottom);
 				e3.className = 'board';
-				e3.style.width = (area[0].length * 20) + "px";
-				e3.style.width = bottom.style.top = (area.length * 20) + "px";
+				let width = area[0].length, height = area.length;
+				e3.style.width = (width * 20) + "px";
+				e3.style.width = bottom.style.top = (height * 20) + "px";
 				for (var y = 0; y < area.length; ++y) {
 					var a = area[y];
 					var e2 = document.createElement("div");
@@ -149,8 +182,11 @@ function draw() {
 					mypos.style.backgroundColor = color;
 					mypos.style.borderRadius = '7px';
 					mypos.className = 'tile';
-					setXY(mypos, thing.x - obj.bx, thing.y - obj.by);
-					e3.appendChild(mypos);
+					var x = thing.x - obj.bx;
+					var y = thing.y - obj.by;
+					setXY(mypos, x, y);
+					if (-1 <= x && x <= width && -1 <= y && y <= height)
+						e3.appendChild(mypos);
 					return mypos;
 				};
 				addEntity(obj, 'blue');
@@ -163,7 +199,7 @@ function draw() {
 					e2 = document.createElement('div');
 					e2.textContent = ind + ": " + ent.name;
 					side.appendChild(e2);
-					cachedX(e2, ent, ind);
+					cachedX(e2, ent, ind + ": ");
 				}
 
 				side.appendChild(document.createElement('hr'));
@@ -178,8 +214,29 @@ function draw() {
 					e2 = document.createElement('div');
 					e2.textContent = ch + ": " + item.name;
 					side.appendChild(e2);
-					cachedX(e2, item, ch);
+					cachedX(e2, item, ch + ": ");
 				}
+
+				if (obj.updates) {
+					for (let msg of obj.updates) {
+						console.log(msg.message);
+					}
+				}
+
+				getChar(function(chinfo) {
+					var text = "";
+					for (let a of attr) {
+						text += a + ": " + chinfo[a] + ", ";
+					}
+					statse.textContent = text.slice(0, -2);
+					var inv = chinfo.inventory;
+					for (let item of inv) {
+						let e2 = document.createElement('div');
+						e2.textContent = item;
+						inventorye.appendChild(e2);
+						cachedX(e2, {_id: item}, "");
+					}
+				}, ch);
 
 				--waitLeft;
 				if (waitLeft === 0) loadDone();
@@ -190,6 +247,6 @@ function draw() {
 }
 draw();
 setInterval(function() {
-	draw();
+	// draw();
 }, 2000);
 </script>
