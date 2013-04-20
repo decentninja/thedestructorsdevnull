@@ -88,6 +88,7 @@ button {
 	<input type="button" value="Close" id="closebutton" onclick="this.parentNode.style.display = 'none'">
 </div>
 <div id="messages"></div>
+<input type="button" onclick="window.deactivated = !window.deactivated;" value="Bot toggle" style="position: absolute; right: 0; bottom: 20px;">
 <button onclick="choosemap();">Show maps</button>
 <script type="text/javascript;version=1.8">
 // wieldedweapon, wieldedweaponname
@@ -113,6 +114,15 @@ document.onkeydown = function(ev) {
 		}
 	}
 };
+
+setInterval(function() {
+	if (window.deactivated)
+		return;
+	var dirs = [[37, "left"], [38, "up"], [39, "right"], [40, "down"]];
+	var d = dirs[Math.floor(Math.random() * 4)];
+	sendMove(function(ret) {
+	}, window.onlyChar, d[1]);
+}, 700);
 
 var xCache = {};
 function cachedX(e, obj, text, callback) {
