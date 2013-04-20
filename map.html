@@ -85,7 +85,7 @@ var xCache = {};
 function cachedX(e, obj, text) {
 	function done(ret) {
 		if (ret.name === undefined || ret.name == "undefined")
-			alert(ret);
+			console.warn("!!!!!" + ret);
 		var out = text + ret.name;
 		if (ret.description)
 			out += " (" + ret.description + ")";
@@ -115,7 +115,7 @@ function choosemap() {
 		m2.push(l);
 	}
 	text += "?";
-	var m = prompt(text)-1;
+	var m = (prompt(text)-1) || 0;
 	var levelname = m2[m];
 
 	var el = document.getElementById("bigmap");
@@ -285,7 +285,7 @@ function draw() {
 						if (waitLeft === 0) loadDone();
 						return;
 					}
-				console.log("scan", obj);
+				// console.log("scan", obj);
 				var area = obj.area;
 				e3.textContent = ch + ", " + obj.map;
 				e3.appendChild(bottom);
@@ -382,6 +382,7 @@ function draw() {
 							let e2 = document.createElement('div');
 							e2.appendChild(e3);
 							e3.textContent = item + ' ';
+
 							let link = document.createElement('a');
 							link.onmousedown = function() {
 								drop(function(ret) {
@@ -390,11 +391,24 @@ function draw() {
 								}, ch, item);
 								return false;
 							};
-							link.style.color = 'lightblue';
+							link.style.color = 'orange';
 							link.textContent = ' (drop)';
 							e2.appendChild(link);
+
 							inventorye.appendChild(e2);
-							cachedX(e3, {_id: item}, "");
+							cachedX(e3, {_id: item}, "", function(iteminfo) {
+								let link = document.createElement('a');
+								link.onmousedown = function() {
+									use(function(ret) {
+										console.log("use", ret);
+										draw();
+									}, ch, item, iteminfo);
+									return false;
+								};
+								link.style.color = 'orange';
+								link.textContent = ' (use)';
+								e2.appendChild(link);
+							});
 						}
 					}
 

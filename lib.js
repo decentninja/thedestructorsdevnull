@@ -56,6 +56,19 @@ function doMoveStairs(success, id, type) {
 	makeReq(type + "&arg=" + id, success);
 }
 
+function doUse(success, id, itemId, itemInfo) {
+	var type;
+	if (itemInfo == "potion")
+		type = "quaff";
+	else if (itemInfo == "weapon")
+		type = "wield";
+	else if (itemInfo == "armor")
+		type = "equip";
+	else
+		type = prompt("lolwat?");
+	makeReq(type + "&arg=" + itemId + "&arg2=" + id, success);
+}
+
 var last10Req = [];
 function ratelimit(fun) {
 	return function f() {
@@ -86,6 +99,7 @@ var pick = ratelimit(doPick);
 var drop = ratelimit(doDrop);
 var allocPoints = ratelimit(doAllocPoints);
 var moveStairs = ratelimit(doMoveStairs);
+var use = ratelimit(doUse);
 
 /*
 createChar(function(ret) {
