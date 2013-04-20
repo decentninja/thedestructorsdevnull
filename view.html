@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<script src="lib.js"></script>
+<div id="list"></div>
+<script type="text/javascript;version=1.8">
+var attr = ["str", "dex", "con", "int", "wis"];
+var f = document.getElementById("list");
+function refresh() {
+	f.textContent = 'Loading...';
+	getParty(function(obj) {
+			console.log(obj);
+		f.textContent = '';
+		var list = obj.characters;
+		for (var i = 0; i < list.length; ++i) {
+			let id = list[i];
+			let el = document.createElement('div');
+			f.appendChild(el);
+			getChar(function(obj) {
+				var a = document.createElement('p');
+				a.textContent = 'Name: ' + obj.name;
+				el.appendChild(a);
+				for (var i = 0; i < attr.length; ++i) {
+					var a = document.createElement('p');
+					a.textContent = attr[i] + ": " + obj[attr[i]];
+					el.appendChild(a);
+				}
+				var b = document.createElement('input');
+				b.type = 'button';
+				b.value = 'Delete';
+				b.onclick = function() {
+					deleteChar(refresh, id);
+				};
+				el.appendChild(b);
+			}, id);
+			f.appendChild(document.createElement('hr'));
+		}
+	});
+}
+refresh();
+</script>
+<a href="create.html">Create character</a>
+</form>

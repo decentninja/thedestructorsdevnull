@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<script src="lib.js"></script>
+<div id="list"></div>
+<script type="text/javascript;version=1.8">
+createChar(function(ret) {
+	console.log(ret);
+	var id = ret._id;
+	getParty(function(ret) {
+		console.log(ret);
+		getChar(function(ret) {
+			console.log(ret);
+			deleteChar(function(ret) {
+				console.log(ret);
+				console.log("done");
+			}, id);
+		}, id);
+	});
+}, {'name':'foobar','str':'15','dex':'15','con':'10','int':'10','wis':'10'});
+</script>
