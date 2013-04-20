@@ -6,6 +6,7 @@
 	left: 70px;
 	width: 350px;
 	margin-top: -55px;
+	/*white-space: pre-line;*/
 }
 .inventory {
 	position: absolute;
@@ -83,6 +84,7 @@ function draw() {
 	}
 	el.textContent = 'Loading...';
 	getParty(function(obj) {
+		console.log("getparty", obj);
 		el.textContent = '';
 		var list = obj.characters;
 		var waitLeft = list.length;
@@ -229,13 +231,31 @@ function draw() {
 					for (let a of attr) {
 						text += a + ": " + chinfo[a] + ", ";
 					}
-					statse.textContent = text.slice(0, -2);
+					text += "hp: " + chinfo.hp;
+					text += ", speed: " + chinfo.speed;
+					text += ", level: " + chinfo.level + " (xp: " + chinfo.exp + ")";
+					// text += ", alloc: " + chinfo.alloc;
+					// text = text.slice(0, -2);
+					statse.textContent = text;
 					var inv = chinfo.inventory;
-					for (let item of inv) {
-						let e2 = document.createElement('div');
-						e2.textContent = item;
-						inventorye.appendChild(e2);
-						cachedX(e2, {_id: item}, "");
+					if (inv) {
+						for (let item of inv) {
+							let e2 = document.createElement('div');
+							e2.textContent = item + ' ';
+							let link = document.createElement('a');
+							link.onmousedown = function() {
+								drop(function(ret) {
+									console.log("drop", ret);
+									draw();
+								}, ch, item);
+								return false;
+							};
+							link.style.color = 'lightblue';
+							link.textContent = '(drop)';
+							e2.appendChild(link);
+							inventorye.appendChild(e2);
+							cachedX(e2, {_id: item}, "");
+						}
 					}
 
 					--waitLeft;
@@ -248,6 +268,6 @@ function draw() {
 }
 draw();
 setInterval(function() {
-	draw();
+	// draw();
 }, 2000);
 </script>

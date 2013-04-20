@@ -1,7 +1,7 @@
 var key = '86848195-3da5-444b-b9ba-50bef67bf677';
 
 function makeReq(urlPart, success) {
-	console.log(urlPart);
+	// console.log(urlPart);
 	var req = new XMLHttpRequest();
 	req.open("GET", "https://genericwitticism.com:8000/api3/?session=" + key + "&command=" + urlPart);
 	req.onreadystatechange = function() {
