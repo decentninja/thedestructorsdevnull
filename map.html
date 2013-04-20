@@ -41,6 +41,18 @@ button {
 	width: 400px;
 	overflow: auto;
 }
+#messages {
+	position: absolute;
+	right: 0;
+	width: 500px;
+	top: 0;
+	bottom: 25px;
+}
+.logrow {
+	border-bottom: 1px solid #CCCCCC;
+	font-size: 70%;
+	margin: 3px;
+}
 .arrow {
 	width: 15px;
 	display: inline-block;
@@ -75,6 +87,7 @@ button {
 <div id="bigmap"><div id="bigmapcont"></div>
 	<input type="button" value="Close" id="closebutton" onclick="this.parentNode.style.display = 'none'">
 </div>
+<div id="messages"></div>
 <button onclick="choosemap();">Show maps</button>
 <script type="text/javascript;version=1.8">
 // wieldedweapon, wieldedweaponname
@@ -84,6 +97,7 @@ function setXY(e, x, y) {
 	e.style.top = (y * 20 + 80) + 'px';
 	e.style.left = (x * 20) + 'px';
 }
+var nlogs = 0;
 
 document.onkeydown = function(ev) {
 	if (ev.keyCode === 27)
@@ -381,7 +395,32 @@ function draw() {
 
 				if (obj.updates) {
 					for (let msg of obj.updates) {
-						console.log(msg.message);
+						let logrow = document.createElement('div');
+						let text;
+						if (msg.message) {
+							text = msg.message;
+						}
+						else if (msg.character) {
+							let info = msg.character;
+							text = info.name + " leveled up to level " + info.level + "!";
+							logrow.style.color = 'lightblue';
+						}
+						else if (msg.inventory) {
+							// Whatever, we knew that.
+							return;
+						}
+						else {
+							console.warn(msg);
+							continue;
+						}
+						logrow.className = 'logrow';
+						logrow.textContent = text;
+						let cont = document.getElementById("messages");
+						cont.appendChild(logrow);
+						if (++nlogs > 17) {
+							cont.removeChild(cont.firstChild);
+						}
+						console.log("Message: " + text);
 					}
 				}
 
