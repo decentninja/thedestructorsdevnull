@@ -45,7 +45,7 @@ function doPick(success, id) {
 }
 
 function doDrop(success, id, itemId) {
-	makeReq("get&arg=" + encodeURIComponent(itemId) + "&arg2=" + encodeURIComponent(id), success);
+	makeReq("drop&arg=" + encodeURIComponent(itemId) + "&arg2=" + encodeURIComponent(id), success);
 }
 
 var last10Req = [];

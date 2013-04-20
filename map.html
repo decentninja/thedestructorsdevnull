@@ -143,6 +143,7 @@ function draw() {
 				arrowe.appendChild(document.createElement('br'));
 			}
 			scan(function(obj) {
+				console.log("scan", obj);
 				var area = obj.area;
 				let roomid = 0;
 				e3.textContent = ch + ", " + obj.map;
@@ -240,8 +241,10 @@ function draw() {
 					var inv = chinfo.inventory;
 					if (inv) {
 						for (let item of inv) {
+							let e3 = document.createElement('span');
 							let e2 = document.createElement('div');
-							e2.textContent = item + ' ';
+							e2.appendChild(e3);
+							e3.textContent = item + ' ';
 							let link = document.createElement('a');
 							link.onmousedown = function() {
 								drop(function(ret) {
@@ -254,7 +257,7 @@ function draw() {
 							link.textContent = '(drop)';
 							e2.appendChild(link);
 							inventorye.appendChild(e2);
-							cachedX(e2, {_id: item}, "");
+							cachedX(e3, {_id: item}, "");
 						}
 					}
 
@@ -268,6 +271,6 @@ function draw() {
 }
 draw();
 setInterval(function() {
-	// draw();
+	draw();
 }, 2000);
 </script>
